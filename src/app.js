@@ -1,8 +1,12 @@
-const pool = require('../src/config/db');
+const express = require("express");
+const cors = require("cors");
+const app = express();
 
-const getEmpresas = async () => {
-  const result = await pool.query('SELECT * FROM empresa');
-  console.log(result.rows);
-};
+const authRoutes = require("./modules/auth/auth.routes");
 
-getEmpresas()
+app.use(express.json());
+
+// prefijo API
+app.use("/api/auth", authRoutes);
+
+module.exports = app;
