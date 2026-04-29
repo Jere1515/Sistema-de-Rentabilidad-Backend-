@@ -5,7 +5,7 @@ const { generateToken } = require("../../utils/jwt");
 
 const loginService = async (email, password) => {
   const query = `
-    SELECT id_usuario, nombre, email, password, rol, is_active
+    SELECT id_usuario, id_empresa, nombre, email, password, rol, is_active
     FROM usuario
     WHERE email = $1
     LIMIT 1
@@ -33,6 +33,7 @@ const loginService = async (email, password) => {
     id_usuario: user.id_usuario,
     email: user.email,
     rol: user.rol,
+    id_empresa: user.id_empresa,
   });
 
   return {
