@@ -1,0 +1,50 @@
+const historialRepository = require('./historial.repository.js');
+const usuarioRepository = require('../usuario/usuario.repository');
+
+const createHistorial = async (data, currentUser) => {
+    const { id_usuario, tipo_pago, monto, horas_mensuales } = data;
+
+    // 📅 fecha automática
+    const fecha_inicio = new Date();
+
+    // 🔍 validar usuario
+    const usuario = await usuarioRepository.findById(id_usuario);
+    if (!usuario) {
+        const error = new Error('Usuario no existe');
+        error.status = 404;
+        throw error;
+    }
+
+    // 🔐 validar que pertenezca a la empresa
+    if (usuario.id_empresa !== currentUser.id_empresa) {
+        const error = new Error('No autorizado');
+        error.status = 403;
+        throw error;
+    }
+
+    // 🔍 buscar sueldo activo
+    const activo = await historialRepository.findActivo(id_usuario);
+
+    // 🛑 cerrar anterior si existe
+    if (activo) {
+        await historialRepository.cerrarHistorial(
+            activo.id_historial,
+            fecha_inicio
+        );
+    }
+
+    // ✅ crear nuevo historial
+    const nuevo = await historialRepository.create({
+        id_usuario,
+        tipo_pago,
+        monto,
+        fecha_inicio,
+        horas_mensuales
+    });
+
+    return nuevo;
+};
+
+module.exports = {
+    createHistorial
+};

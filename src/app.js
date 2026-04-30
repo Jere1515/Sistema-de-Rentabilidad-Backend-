@@ -7,6 +7,7 @@ const authRoutes = require("./modules/auth/auth.routes");
 const empresaRoutes = require("./modules/empresa/empresa.routes");
 const servicioRoutes = require("./modules/servicio/servicio.routes");
 const usuarioRoutes = require("./modules/usuario/usuario.routes");
+const historialRoutes = require("./modules/historial_horas/historial.routes");
 
 const errorHandler = require("./modules/middlewares/errorHandler");
 
@@ -17,6 +18,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/empresas", empresaRoutes);
 app.use("/api/servicios", servicioRoutes);
 app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/historiales", historialRoutes);
 
 // SIEMPRE AL FINAL
 app.use(errorHandler);
