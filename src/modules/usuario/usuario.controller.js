@@ -25,9 +25,18 @@ const getUsuarios = async (req, res, next) => {
 
 const createUsuario = async (req, res, next) => {
     try {
-        const data = req.body;
+        // 📌 Verificar que el usuario esté autenticado
+        if (!req.user || !req.user.id_usuario) {
+            return res.status(401).json({
+                success: false,
+                message: "Usuario no autenticado",
+            });
+        }
 
-        const usuario = await usuarioService.createUsuario(data);
+        const usuario = await usuarioService.createUsuario(
+            req.body,
+            req.user
+        );
 
         res.status(201).json({
             success: true,
