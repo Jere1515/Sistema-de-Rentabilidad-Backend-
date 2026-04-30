@@ -100,7 +100,90 @@ const createServicio = async (req, res, next) => {
     }
 };
 
+const getServicioById = async (req, res, next) => {
+    try {
+        if (!req.user || !req.user.id_usuario) {
+            return res.status(401).json({ success: false, message: 'Usuario no autenticado' });
+        }
+
+        const { id_usuario } = req.user;
+        const servicioId = parseInt(req.params.id, 10);
+
+        const userDB = await usuarioRepository.findById(id_usuario);
+        if (!userDB) {
+            return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+        }
+        if (!userDB.id_empresa) {
+            return res.status(400).json({ success: false, message: 'El usuario no tiene una empresa asociada' });
+        }
+
+        const servicio = await servicioService.getServicioById(servicioId, userDB.id_empresa);
+
+        return res.status(200).json({ success: true, data: servicio });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const updateServicio = async (req, res, next) => {
+    try {
+        if (!req.user || !req.user.id_usuario) {
+            return res.status(401).json({ success: false, message: 'Usuario no autenticado' });
+        }
+
+        const { id_usuario } = req.user;
+        const servicioId = parseInt(req.params.id, 10);
+        const { nombre, descripcion } = req.body;
+
+        const userDB = await usuarioRepository.findById(id_usuario);
+        if (!userDB) {
+            return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+        }
+        if (!userDB.id_empresa) {
+            return res.status(400).json({ success: false, message: 'El usuario no tiene una empresa asociada' });
+        }
+
+        const servicio = await servicioService.updateServicio(servicioId, userDB.id_empresa, { nombre, descripcion });
+
+        return res.status(200).json({ success: true, data: servicio });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const desactivarServicio = async (req, res, next) => {
+    try {
+        if (!req.user || !req.user.id_usuario) {
+            return res.status(401).json({ success: false, message: 'Usuario no autenticado' });
+        }
+
+        const { id_usuario } = req.user;
+        const servicioId = parseInt(req.params.id, 10);
+
+        const userDB = await usuarioRepository.findById(id_usuario);
+        if (!userDB) {
+            return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+        }
+        if (!userDB.id_empresa) {
+            return res.status(400).json({ success: false, message: 'El usuario no tiene una empresa asociada' });
+        }
+
+        const result = await servicioService.desactivarServicio(servicioId, userDB.id_empresa);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Servicio desactivado correctamente',
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getServicios,
     createServicio,
+    getServicioById,
+    updateServicio,
+    desactivarServicio,
 };

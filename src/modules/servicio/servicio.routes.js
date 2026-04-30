@@ -1,27 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const servicioController = require('./servicio.controller');
-const { createServicioValidation } = require('./servicio.validation');
+const {
+  createServicioValidation,
+  updateServicioValidation,
+  servicioIdParamValidation,
+} = require('./servicio.validation');
 const auth = require('../../modules/middlewares/authMiddleware');
 const role = require('../../modules/middlewares/roleMiddleware');
 
-// GET /servicios - Obtener servicios de la empresa del usuario autenticado
-// Solo usuarios con rol "dueno" pueden ver servicios
-router.get(
-  '/',
-  auth,
-  role('dueno'),
-  servicioController.getServicios
-);
+// HU 8 - GET /servicios
+router.get('/', auth, role('dueno'), servicioController.getServicios);
 
-// POST /servicios - Crear nuevo servicio
-// Solo usuarios con rol "dueno" pueden crear servicios
-router.post(
-  '/',
-  auth,
-  role('dueno'),
-  createServicioValidation,
-  servicioController.createServicio
-);
+// HU 9 - POST /servicios
+router.post('/', auth, role('dueno'), createServicioValidation, servicioController.createServicio);
+
+// HU 10 - GET /servicios/:id
+router.get('/:id', auth, role('dueno'), servicioIdParamValidation, servicioController.getServicioById);
+
+// HU 11 - PUT /servicios/:id/desactivar (antes de PUT /:id para evitar ambigüedad)
+router.put('/:id/desactivar', auth, role('dueno'), servicioIdParamValidation, servicioController.desactivarServicio);
+
+// HU 10 - PUT /servicios/:id
+router.put('/:id', auth, role('dueno'), servicioIdParamValidation, updateServicioValidation, servicioController.updateServicio);
 
 module.exports = router;

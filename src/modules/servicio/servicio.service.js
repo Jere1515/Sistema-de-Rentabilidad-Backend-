@@ -1,16 +1,11 @@
 const servicioRepository = require('./servicio.repository');
 
 const getServiciosByEmpresa = async (empresaId) => {
-  // 🔍 Obtener servicios de la empresa del usuario autenticado
-  const servicios = await servicioRepository.findByEmpresaId(empresaId);
-
-  return servicios;
+  return await servicioRepository.findByEmpresaId(empresaId);
 };
 
 const createServicio = async ({ nombre, descripcion, empresaId }) => {
-  // 🔒 Validar que no exista ya un servicio con el mismo nombre en esta empresa
-  const servicios = await servicioRepository.findByEmpresaId(empresaId);
-  const existe = servicios.some(s => s.nombre.toLowerCase() === nombre.toLowerCase());
+  const existe = await servicioRepository.findByNombreAndEmpresa(nombre, empresaId);
 
   if (existe) {
     const error = new Error('Ya existe un servicio con este nombre en tu empresa');
@@ -18,17 +13,83 @@ const createServicio = async ({ nombre, descripcion, empresaId }) => {
     throw error;
   }
 
-  // ✅ Crear nuevo servicio
-  const servicio = await servicioRepository.create({
-    nombre,
-    descripcion,
-    empresaId
-  });
+  return await servicioRepository.create({ nombre, descripcion, empresaId });
+};
+
+const getServicioById = async (servicioId, empresaId) => {
+  const servicio = await servicioRepository.findById(servicioId);
+
+  if (!servicio) {
+    const error = new Error('Servicio no encontrado');
+    error.status = 404;
+    throw error;
+  }
+
+  if (servicio.id_empresa !== empresaId) {
+    const error = new Error('No tienes permisos para acceder a este servicio');
+    error.status = 403;
+    throw error;
+  }
 
   return servicio;
 };
 
+const updateServicio = async (servicioId, empresaId, { nombre, descripcion }) => {
+  const servicio = await servicioRepository.findById(servicioId);
+
+  if (!servicio) {
+    const error = new Error('Servicio no encontrado');
+    error.status = 404;
+    throw error;
+  }
+
+  if (servicio.id_empresa !== empresaId) {
+    const error = new Error('No tienes permisos para modificar este servicio');
+    error.status = 403;
+    throw error;
+  }
+
+  if (nombre && nombre.toLowerCase() !== servicio.nombre.toLowerCase()) {
+    const duplicado = await servicioRepository.findByNombreAndEmpresa(nombre, empresaId);
+    if (duplicado) {
+      const error = new Error('Ya existe un servicio con este nombre en tu empresa');
+      error.status = 400;
+      throw error;
+    }
+  }
+
+  return await servicioRepository.update(servicioId, { nombre, descripcion });
+};
+
+const desactivarServicio = async (servicioId, empresaId) => {
+  const servicio = await servicioRepository.findByIdFull(servicioId);
+
+  if (!servicio) {
+    const error = new Error('Servicio no encontrado');
+    error.status = 404;
+    throw error;
+  }
+
+  if (servicio.id_empresa !== empresaId) {
+    const error = new Error('No tienes permisos para desactivar este servicio');
+    error.status = 403;
+    throw error;
+  }
+
+  if (!servicio.is_active) {
+    const error = new Error('El servicio ya está inactivo');
+    error.status = 400;
+    throw error;
+  }
+
+  const result = await servicioRepository.deactivate(servicioId);
+  return result;
+};
+
 module.exports = {
   getServiciosByEmpresa,
-  createServicio
+  createServicio,
+  getServicioById,
+  updateServicio,
+  desactivarServicio,
 };
