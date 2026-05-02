@@ -1,5 +1,4 @@
 const { body, validationResult } = require('express-validator');
-const empresaRepository = require('../empresa/empresa.repository');
 
 const createUsuarioValidation = [
     body('nombre')
@@ -19,31 +18,9 @@ const createUsuarioValidation = [
         .matches(/[0-9]/).withMessage('Debe contener al menos un número')
         .matches(/[^A-Za-z0-9]/).withMessage('Debe contener un carácter especial'),
 
-    body('id_empresa')
-        .optional()
-        .isInt().withMessage('Empresa inválida')
-        .custom(async (value, { req }) => {
-            // solo validar si viene (caso admin)
-            if (value) {
-                const empresa = await empresaRepository.findById(value);
-                if (!empresa) {
-                    throw new Error('La empresa no existe');
-                }
-            }
-            return true;
-        }),
-
     body('rol')
-        .isIn(['lider', 'empleado','dueno']).withMessage('Rol inválido'),
-
-    body('monto')
-        .optional()
-        .isNumeric().withMessage('Monto inválido'),
-
-    body('tipo_pago')
-        .optional()
-        .isIn(['mensual', 'por_hora'])
-        .withMessage('Tipo de pago inválido o vacío'),
+        .notEmpty().withMessage('El rol es obligatorio')
+        .isIn(['lider', 'empleado']).withMessage('Rol inválido'),
 
     (req, res, next) => {
         const errors = validationResult(req);

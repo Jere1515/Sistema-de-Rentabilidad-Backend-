@@ -10,18 +10,21 @@ const auth = require('../../modules/middlewares/authMiddleware');
 const role = require('../../modules/middlewares/roleMiddleware');
 
 // HU 8 - GET /servicios
-router.get('/', auth, role('dueno'), servicioController.getServicios);
+router.get('/', auth, role('propietario'), servicioController.getServicios);
 
 // HU 9 - POST /servicios
-router.post('/', auth, role('dueno'), createServicioValidation, servicioController.createServicio);
+router.post('/', auth, role('propietario'), createServicioValidation, servicioController.createServicio);
 
 // HU 10 - GET /servicios/:id
-router.get('/:id', auth, role('dueno'), servicioIdParamValidation, servicioController.getServicioById);
+router.get('/:id', auth, role('propietario'), servicioIdParamValidation, servicioController.getServicioById);
 
 // HU 11 - PUT /servicios/:id/desactivar (antes de PUT /:id para evitar ambigüedad)
-router.put('/:id/desactivar', auth, role('dueno'), servicioIdParamValidation, servicioController.desactivarServicio);
+router.put('/:id/desactivar', auth, role('propietario'), servicioIdParamValidation, servicioController.desactivarServicio);
 
 // HU 10 - PUT /servicios/:id
-router.put('/:id', auth, role('dueno'), servicioIdParamValidation, updateServicioValidation, servicioController.updateServicio);
+router.put('/:id', auth, role('propietario'), servicioIdParamValidation, updateServicioValidation, servicioController.updateServicio);
+
+// DELETE /servicios/:id — propietario elimina permanentemente un servicio
+router.delete('/:id', auth, role('propietario'), servicioIdParamValidation, servicioController.eliminarServicio);
 
 module.exports = router;

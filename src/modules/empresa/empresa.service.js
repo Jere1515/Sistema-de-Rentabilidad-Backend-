@@ -31,8 +31,8 @@ const getEmpresaById = async ({ id, user }) => {
     throw error;
   }
 
-  // 🔐 REGLA: dueño solo ve su empresa
-  if (user.rol === 'dueno' && empresa.id_empresa !== user.id_empresa) {
+  // 🔐 REGLA: owner solo ve su empresa
+  if (user.rol === 'propietario' && empresa.id_empresa !== user.id_empresa) {
     const error = new Error('No tienes acceso a esta empresa');
     error.status = 403;
     throw error;
@@ -52,7 +52,7 @@ const updateEmpresa = async ({ id, nombre, user }) => {
   }
 
   // 🔐 VALIDACIÓN DE PROPIEDAD
-  if (user.rol === 'dueno' && empresa.id_empresa !== user.id_empresa) {
+  if (user.rol === 'propietario' && empresa.id_empresa !== user.id_empresa) {
     const error = new Error('No puedes modificar esta empresa');
     error.status = 403;
     throw error;
@@ -72,9 +72,23 @@ const updateEmpresa = async ({ id, nombre, user }) => {
   return updated;
 };
 
+const deleteEmpresa = async ({ id, user }) => {
+  const empresa = await empresaRepository.findById(id);
+
+  if (!empresa) {
+    const error = new Error('Empresa no encontrada');
+    error.status = 404;
+    throw error;
+  }
+
+  const deleted = await empresaRepository.deleteById(id);
+  return deleted;
+};
+
 module.exports = {
   getEmpresas,
   createEmpresa,
   getEmpresaById,
-  updateEmpresa
+  updateEmpresa,
+  deleteEmpresa
 };

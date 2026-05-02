@@ -14,15 +14,13 @@ const handleValidationErrors = (req, res, next) => {
 const createServicioValidation = [
   body('nombre')
     .notEmpty().withMessage('El nombre es obligatorio')
-    .isLength({ min: 3 }).withMessage('Mínimo 3 caracteres')
-    .matches(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)
-    .withMessage('El nombre solo debe contener letras y espacios'),
+    .isLength({ min: 3, max: 100 }).withMessage('El nombre debe tener entre 3 y 100 caracteres')
+    .trim(),
 
   body('descripcion')
     .optional({ checkFalsy: true })
-    .isLength({ min: 10 }).withMessage('Mínimo 10 caracteres')
-    .matches(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)
-    .withMessage('La descripción solo debe contener letras y espacios'),
+    .isLength({ min: 3, max: 500 }).withMessage('La descripción debe tener entre 3 y 500 caracteres')
+    .trim(),
 
   handleValidationErrors
 ];
@@ -30,15 +28,13 @@ const createServicioValidation = [
 const updateServicioValidation = [
   body('nombre')
     .optional({ checkFalsy: true })
-    .isLength({ min: 3 }).withMessage('Mínimo 3 caracteres')
-    .matches(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)
-    .withMessage('El nombre solo debe contener letras y espacios'),
+    .isLength({ min: 3, max: 100 }).withMessage('El nombre debe tener entre 3 y 100 caracteres')
+    .trim(),
 
   body('descripcion')
     .optional({ checkFalsy: true })
-    .isLength({ min: 10 }).withMessage('Mínimo 10 caracteres')
-    .matches(/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/)
-    .withMessage('La descripción solo debe contener letras y espacios'),
+    .isLength({ min: 3, max: 500 }).withMessage('La descripción debe tener entre 3 y 500 caracteres')
+    .trim(),
 
   (req, res, next) => {
     const { nombre, descripcion } = req.body;

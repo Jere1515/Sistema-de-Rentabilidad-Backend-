@@ -20,15 +20,18 @@ router.post(
 );
 
 // GET /empresas/:id
-router.get('/:id', auth, role('admin', 'dueno'), empresaController.getEmpresaById);
+router.get('/:id', auth, role('admin', 'propietario'), empresaController.getEmpresaById);
 
 // PUT /empresas/:id
 router.put(
     '/:id',
     auth,
-    role('admin', 'dueno'),
+    role('admin', 'propietario'),
     updateEmpresaValidation,
     empresaController.updateEmpresa
 );
+
+// DELETE /empresas/:id
+router.delete('/:id', auth, role('admin'), empresaController.deleteEmpresa);
 
 module.exports = router;

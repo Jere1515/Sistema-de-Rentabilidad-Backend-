@@ -8,12 +8,15 @@ const authController = require("./auth.controller");
 
 router.post("/login", login);
 
-//admin crea dueño
+//admin crea propietario
 router.post(
-    "/register-owner",
+    "/register-propietario",
     authMiddleware,
     roleMiddleware("admin"),
     authController.registerOwner,
 );
+
+// POST /auth/get-owner-contact — público, recibe email y retorna email del propietario
+router.post("/get-owner-contact", authController.getOwnerContact);
 
 module.exports = router;
