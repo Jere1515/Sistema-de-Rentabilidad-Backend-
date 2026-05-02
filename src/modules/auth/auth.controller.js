@@ -1,6 +1,6 @@
 const { loginService, registerOwnerService, getOwnerContactService } = require("../auth/auth.service");
 
-const registerOwner = async(req, res) => {
+const registerOwner = async (req, res) => {
     try {
         const { id_empresa, nombre, email, password } = req.body;
 
@@ -48,7 +48,7 @@ const registerOwner = async(req, res) => {
     }
 };
 
-const login = async(req, res) => {
+const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
